@@ -15,15 +15,15 @@ public class AuthController {
 
     @GetMapping("/kakao/callback")
     public ApiResponse<?> kakaoCallback(@RequestParam String code) {
-        AuthService.LoginResult result = authService.mockLogin();
+        AuthService.LoginResult result = authService.kakaoLogin(code);
 
         return ApiResponse.ok(Map.of(
-            "accessToken", result.getAccessToken(),
+            "accessToken",  result.getAccessToken(),
             "refreshToken", result.getRefreshToken(),
             "user", Map.of(
-                "id", result.getUserId(),
+                "id",       result.getUserId(),
                 "nickname", result.getNickname(),
-                "email", result.getEmail()
+                "email",    result.getEmail()
             )
         ));
     }
