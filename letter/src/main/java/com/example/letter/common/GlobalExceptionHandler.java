@@ -36,6 +36,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(KakaoAuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleKakaoAuth(KakaoAuthException e) {
-        return ApiResponse.fail("KAKAO_AUTH_FAILED", e.getMessage());
+        return ApiResponse.fail("KAKAO_AUTH_FAILED", "카카오 로그인에 실패했습니다");
     }
 }
