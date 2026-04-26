@@ -12,6 +12,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...(init.headers as Record<string, string> | undefined),
   }
   const res = await fetch(`${BASE}${path}`, { ...init, headers })
+  if (!res.ok) {
+    const err = await res.json().catch(() => null)
+    throw new Error(err?.error?.code ?? `HTTP_${res.status}`)
+  }
   const json = await res.json()
   if (!json.ok) throw new Error(json.error?.code ?? 'UNKNOWN_ERROR')
   return json.data as T
