@@ -1,5 +1,6 @@
 package com.example.letter.common;
 
+import com.example.letter.auth.KakaoAuthException;
 import com.example.letter.letter.LetterNotFoundException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
@@ -30,5 +31,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleJwt(JwtException e) {
         return ApiResponse.fail("UNAUTHORIZED", "토큰이 유효하지 않습니다");
+    }
+
+    @ExceptionHandler(KakaoAuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleKakaoAuth(KakaoAuthException e) {
+        return ApiResponse.fail("KAKAO_AUTH_FAILED", e.getMessage());
     }
 }
