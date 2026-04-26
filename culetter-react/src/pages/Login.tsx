@@ -1,27 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { LOGO_SVG } from '../data'
 import { api } from '../api/client'
 import { useToast } from '../hooks/useToast'
 
+const KAKAO_AUTH_URL =
+  `https://kauth.kakao.com/oauth/authorize` +
+  `?client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}` +
+  `&redirect_uri=${encodeURIComponent(import.meta.env.VITE_KAKAO_REDIRECT_URI ?? 'http://localhost:5173/login')}` +
+  `&response_type=code`
+
 export default function Login() {
   const navigate = useNavigate()
   const { show } = useToast()
   const [loading, setLoading] = useState(false)
 
-  const handleKakaoLogin = async () => {
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get('code')
+    if (!code) return
+
+    window.history.replaceState({}, '', '/login')
     setLoading(true)
-    try {
-      const data = await api.mockLogin()
-      localStorage.setItem('culetter_access_token', data.accessToken)
-      localStorage.setItem('culetter_refresh_token', data.refreshToken)
-      navigate('/select')
-    } catch {
-      show('로그인에 실패했어요 😢')
-    } finally {
-      setLoading(false)
-    }
+
+    api.kakaoLogin(code)
+      .then(data => {
+        localStorage.setItem('culetter_access_token', data.accessToken)
+        localStorage.setItem('culetter_refresh_token', data.refreshToken)
+        navigate('/select')
+      })
+      .catch(() => show('로그인에 실패했어요 😢'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleKakaoLogin = () => {
+    window.location.href = KAKAO_AUTH_URL
   }
 
   return (

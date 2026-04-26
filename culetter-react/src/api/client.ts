@@ -30,8 +30,8 @@ export type LetterData = {
 }
 
 export const api = {
-  mockLogin: () =>
-    request<LoginData>('/auth/kakao/callback?code=mock'),
+  kakaoLogin: (code: string) =>
+    request<LoginData>(`/auth/kakao/callback?code=${encodeURIComponent(code)}`),
 
   sendLetter: (payload: { templateId: string; to: string; body: string; from: string; stickers: object[] }) =>
     request<SendLetterData>('/letters', {
