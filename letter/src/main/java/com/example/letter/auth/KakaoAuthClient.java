@@ -1,6 +1,7 @@
 package com.example.letter.auth;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -19,11 +20,12 @@ public class KakaoAuthClient {
 
     public KakaoAuthClient(
         @Value("${culetter.kakao.client-id}") String clientId,
-        @Value("${culetter.kakao.redirect-uri}") String redirectUri
+        @Value("${culetter.kakao.redirect-uri}") String redirectUri,
+        RestClient.Builder restClientBuilder
     ) {
         this.clientId    = clientId;
         this.redirectUri = redirectUri;
-        this.restClient  = RestClient.create();
+        this.restClient  = restClientBuilder.build();
     }
 
     public KakaoTokenResponse getToken(String code) {
@@ -38,8 +40,10 @@ public class KakaoAuthClient {
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(form)
             .retrieve()
-            .onStatus(status -> status.is4xxClientError(),
-                (req, res) -> { throw new KakaoAuthException("카카오 토큰 발급 실패"); })
+            .onStatus(HttpStatusCode::is4xxClientError,
+                (req, res) -> { throw new KakaoAuthException("카카오 토큰 발급 실패 [" + res.getStatusCode() + "]"); })
+            .onStatus(HttpStatusCode::is5xxServerError,
+                (req, res) -> { throw new KakaoAuthException("카카오 서버 오류 [" + res.getStatusCode() + "]"); })
             .body(KakaoTokenResponse.class);
     }
 
@@ -48,8 +52,10 @@ public class KakaoAuthClient {
             .uri(USER_URL)
             .header("Authorization", "Bearer " + kakaoAccessToken)
             .retrieve()
-            .onStatus(status -> status.is4xxClientError(),
-                (req, res) -> { throw new KakaoAuthException("카카오 유저 정보 조회 실패"); })
+            .onStatus(HttpStatusCode::is4xxClientError,
+                (req, res) -> { throw new KakaoAuthException("카카오 유저 정보 조회 실패 [" + res.getStatusCode() + "]"); })
+            .onStatus(HttpStatusCode::is5xxServerError,
+                (req, res) -> { throw new KakaoAuthException("카카오 서버 오류 [" + res.getStatusCode() + "]"); })
             .body(KakaoUserResponse.class);
     }
 }
