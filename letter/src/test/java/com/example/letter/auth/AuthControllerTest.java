@@ -9,6 +9,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -66,6 +67,8 @@ class AuthControllerTest {
         mvc.perform(get("/v1/auth/kakao/callback").param("code", "mock-code-2"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.user.email").value("tester@kakao.com"));
+
+        assertThat(userRepository.count()).isEqualTo(1L);
     }
 
     @Test

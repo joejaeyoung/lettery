@@ -5,6 +5,7 @@ import com.example.letter.user.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +35,13 @@ public class AuthService {
             .filter(n -> n != null && !n.isBlank())
             .orElse("익명");
 
-        User user = userRepository.findByEmail(email)
-            .orElseGet(() -> userRepository.save(User.of(nickname, email)));
+        User user;
+        try {
+            user = userRepository.findByEmail(email)
+                .orElseGet(() -> userRepository.save(User.of(nickname, email)));
+        } catch (DataIntegrityViolationException ex) {
+            user = userRepository.findByEmail(email).orElseThrow(() -> ex);
+        }
 
         return new LoginResult(
             jwtProvider.generateAccessToken(user.getId()),
@@ -47,9 +53,14 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResult mockLogin() {
-        User user = userRepository.findByEmail("mock@culetter.com")
-            .orElseGet(() -> userRepository.save(User.of("연우", "mock@culetter.com")));
+    LoginResult mockLogin() {
+        User user;
+        try {
+            user = userRepository.findByEmail("mock@culetter.com")
+                .orElseGet(() -> userRepository.save(User.of("연우", "mock@culetter.com")));
+        } catch (DataIntegrityViolationException ex) {
+            user = userRepository.findByEmail("mock@culetter.com").orElseThrow(() -> ex);
+        }
 
         return new LoginResult(
             jwtProvider.generateAccessToken(user.getId()),
