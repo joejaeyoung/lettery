@@ -33,4 +33,8 @@ public class User {
         user.createdAt = LocalDateTime.now();
         return user;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

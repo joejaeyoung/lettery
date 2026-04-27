@@ -38,28 +38,10 @@ public class AuthService {
         User user;
         try {
             user = userRepository.findByEmail(email)
+                .map(existing -> { existing.updateNickname(nickname); return existing; })
                 .orElseGet(() -> userRepository.save(User.of(nickname, email)));
         } catch (DataIntegrityViolationException ex) {
             user = userRepository.findByEmail(email).orElseThrow(() -> ex);
-        }
-
-        return new LoginResult(
-            jwtProvider.generateAccessToken(user.getId()),
-            jwtProvider.generateRefreshToken(user.getId()),
-            user.getId(),
-            user.getNickname(),
-            user.getEmail()
-        );
-    }
-
-    @Transactional
-    LoginResult mockLogin() {
-        User user;
-        try {
-            user = userRepository.findByEmail("mock@culetter.com")
-                .orElseGet(() -> userRepository.save(User.of("연우", "mock@culetter.com")));
-        } catch (DataIntegrityViolationException ex) {
-            user = userRepository.findByEmail("mock@culetter.com").orElseThrow(() -> ex);
         }
 
         return new LoginResult(

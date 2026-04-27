@@ -35,7 +35,7 @@ export default function Login() {
       .finally(() => { if (active) setLoading(false) })
 
     return () => { active = false }
-  }, [])
+  }, [navigate, show])
 
   const handleKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL
