@@ -8,11 +8,11 @@ export default function Send() {
   const { show } = useToast()
   const [params] = useSearchParams()
   const token = params.get('t') || Math.random().toString(36).slice(2, 10)
-  const shareUrl = useMemo(() => `Culetter.com/letter/${token}`, [token])
+  const shareUrl = useMemo(() => `${window.location.origin}/letter/${token}`, [token])
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(`https://${shareUrl}`)
+      await navigator.clipboard.writeText(shareUrl)
       show('링크가 복사되었어요! 💌')
     } catch {
       show('복사에 실패했어요 😢')
