@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import LoadingOverlay from '../components/LoadingOverlay'
@@ -20,7 +20,19 @@ export default function Write() {
   const [to, setTo] = useState('')
   const [body, setBody] = useState('')
   const [from, setFrom] = useState('')
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem('culetter_draft')
+    if (!raw) return
+    sessionStorage.removeItem('culetter_draft')
+    const draft = JSON.parse(raw) as { paperId: string; to: string; body: string; from: string }
+    setPaperId(draft.paperId)
+    setTo(draft.to)
+    setBody(draft.body)
+    setFrom(draft.from)
+  }, [])
   const [loading, setLoading] = useState(false)
+  const [loginRequired, setLoginRequired] = useState(false)
 
   const paper = PAPERS.find(p => p.id === paperId) || PAPERS[0]
   const visibleThumbs = useMemo(
@@ -45,8 +57,12 @@ export default function Write() {
         stickers: [],
       })
       navigate(`/send?t=${data.shareToken}`)
-    } catch {
-      show('편지 전송에 실패했어요 😢')
+    } catch (err) {
+      if (err instanceof Error && err.message === 'HTTP_401') {
+        setLoginRequired(true)
+      } else {
+        show('편지 전송에 실패했어요 😢')
+      }
     } finally {
       setLoading(false)
     }
@@ -54,6 +70,21 @@ export default function Write() {
 
   return (
     <>
+      {loginRequired && (
+        <div className="modal-overlay visible" onClick={() => setLoginRequired(false)}>
+          <div className="modal-card" onClick={e => e.stopPropagation()}>
+            <p className="modal-title">로그인이 필요해요</p>
+            <p className="modal-desc">편지를 보내려면 로그인하셔야 사용 가능해요</p>
+            <div className="modal-actions">
+              <button className="modal-btn-secondary" onClick={() => setLoginRequired(false)}>취소</button>
+              <button className="modal-btn-primary" onClick={() => {
+                sessionStorage.setItem('culetter_draft', JSON.stringify({ paperId, to, body, from }))
+                navigate('/login')
+              }}>로그인하러 가기</button>
+            </div>
+          </div>
+        </div>
+      )}
       <section className="page active" id="page-write">
         <Header right="write-actions" onDraftClick={lockedToast} onDoneClick={sendLetter} />
 
