@@ -31,11 +31,16 @@ export default function Write() {
       setBody(draft.body)
       setFrom(draft.from)
     } catch {
-      // malformed draft — discard silently
-    } finally {
       sessionStorage.removeItem('culetter_draft')
     }
   }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      sessionStorage.setItem('culetter_draft', JSON.stringify({ paperId, to, body, from }))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [paperId, to, body, from])
   const [loading, setLoading] = useState(false)
   const [loginRequired, setLoginRequired] = useState(false)
 
