@@ -24,12 +24,17 @@ export default function Write() {
   useEffect(() => {
     const raw = sessionStorage.getItem('culetter_draft')
     if (!raw) return
-    sessionStorage.removeItem('culetter_draft')
-    const draft = JSON.parse(raw) as { paperId: string; to: string; body: string; from: string }
-    setPaperId(draft.paperId)
-    setTo(draft.to)
-    setBody(draft.body)
-    setFrom(draft.from)
+    try {
+      const draft = JSON.parse(raw) as { paperId: string; to: string; body: string; from: string }
+      setPaperId(draft.paperId)
+      setTo(draft.to)
+      setBody(draft.body)
+      setFrom(draft.from)
+    } catch {
+      // malformed draft — discard silently
+    } finally {
+      sessionStorage.removeItem('culetter_draft')
+    }
   }, [])
   const [loading, setLoading] = useState(false)
   const [loginRequired, setLoginRequired] = useState(false)
@@ -51,6 +56,7 @@ export default function Write() {
       setLoginRequired(true)
       return
     }
+    sessionStorage.setItem('culetter_draft', JSON.stringify({ paperId, to, body, from }))
     setLoading(true)
     try {
       const data = await api.sendLetter({
@@ -60,6 +66,7 @@ export default function Write() {
         from: from.trim() || '보내는 사람',
         stickers: [],
       })
+      sessionStorage.removeItem('culetter_draft')
       navigate(`/send?t=${data.shareToken}`)
     } catch (err) {
       show('편지 전송에 실패했어요 😢')
