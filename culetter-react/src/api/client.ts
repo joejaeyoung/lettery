@@ -33,22 +33,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { ...init, headers })
 
   if (res.status === 401) {
+    let newToken: string
     try {
       if (!refreshPromise) {
         refreshPromise = refreshAccessToken().finally(() => { refreshPromise = null })
       }
-      const newToken = await refreshPromise
-      const retryRes = await fetch(`${BASE}${path}`, {
-        ...init,
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${newToken}` },
-      })
-      if (!retryRes.ok) {
-        const errJson = await retryRes.json().catch(() => null)
-        throw new Error(errJson?.error?.code ?? `HTTP_${retryRes.status}`)
-      }
-      const retryJson = await retryRes.json()
-      if (!retryJson.ok) throw new Error(retryJson.error?.code ?? 'UNKNOWN_ERROR')
-      return retryJson.data as T
+      newToken = await refreshPromise
     } catch {
       localStorage.removeItem('culetter_access_token')
       localStorage.removeItem('culetter_refresh_token')
@@ -56,6 +46,17 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       window.location.href = '/login'
       throw new Error('SESSION_EXPIRED')
     }
+    const retryRes = await fetch(`${BASE}${path}`, {
+      ...init,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${newToken}` },
+    })
+    if (!retryRes.ok) {
+      const errJson = await retryRes.json().catch(() => null)
+      throw new Error(errJson?.error?.code ?? `HTTP_${retryRes.status}`)
+    }
+    const retryJson = await retryRes.json()
+    if (!retryJson.ok) throw new Error(retryJson.error?.code ?? 'UNKNOWN_ERROR')
+    return retryJson.data as T
   }
 
   if (!res.ok) {
