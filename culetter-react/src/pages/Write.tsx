@@ -47,6 +47,10 @@ export default function Write() {
       show('편지 내용을 먼저 작성해 주세요 ✏️')
       return
     }
+    if (!localStorage.getItem('culetter_access_token')) {
+      setLoginRequired(true)
+      return
+    }
     setLoading(true)
     try {
       const data = await api.sendLetter({
@@ -58,11 +62,7 @@ export default function Write() {
       })
       navigate(`/send?t=${data.shareToken}`)
     } catch (err) {
-      if (err instanceof Error && err.message === 'HTTP_401') {
-        setLoginRequired(true)
-      } else {
-        show('편지 전송에 실패했어요 😢')
-      }
+      show('편지 전송에 실패했어요 😢')
     } finally {
       setLoading(false)
     }
