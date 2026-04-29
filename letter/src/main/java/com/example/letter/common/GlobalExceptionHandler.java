@@ -1,5 +1,6 @@
 package com.example.letter.common;
 
+import com.example.letter.auth.InvalidRefreshTokenException;
 import com.example.letter.auth.KakaoAuthException;
 import com.example.letter.letter.LetterNotFoundException;
 import io.jsonwebtoken.JwtException;
@@ -37,5 +38,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleKakaoAuth(KakaoAuthException e) {
         return ApiResponse.fail("KAKAO_AUTH_FAILED", "카카오 로그인에 실패했습니다");
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleInvalidRefreshToken(InvalidRefreshTokenException e) {
+        return ApiResponse.fail("INVALID_REFRESH_TOKEN", "리프레시 토큰이 유효하지 않습니다");
     }
 }

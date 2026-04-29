@@ -1198,6 +1198,44 @@
       .draft-modal-actions { flex-direction: column; }
     }
 
+    /* login-required modal */
+    .modal-overlay.visible {
+      opacity: 1; pointer-events: auto;
+    }
+    .modal-card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.16);
+      width: 100%; max-width: 360px;
+      padding: 32px 28px 24px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .modal-title {
+      font-size: 18px; font-weight: 700; color: #1a1a1a;
+      text-align: center; margin: 0;
+    }
+    .modal-desc {
+      font-size: 14px; color: #777; text-align: center; margin: 0;
+      line-height: 1.6;
+    }
+    .modal-actions {
+      display: flex; gap: 10px; width: 100%; margin-top: 8px;
+    }
+    .modal-btn-secondary {
+      flex: 1; height: 46px; border-radius: 12px;
+      background: white; border: 1.5px solid #ddd;
+      font-size: 15px; font-weight: 600; color: #888;
+      cursor: pointer; font-family: inherit;
+    }
+    .modal-btn-primary {
+      flex: 1; height: 46px; border-radius: 12px;
+      background: var(--green-primary); border: none;
+      font-size: 15px; font-weight: 700; color: white;
+      cursor: pointer; font-family: inherit;
+      transition: background .2s;
+    }
+    .modal-btn-primary:hover { background: #8fd430; }
+
     /* =====================================================
        PAGE — PROFILE (내 정보)
     ===================================================== */

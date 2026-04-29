@@ -26,16 +26,17 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(Long userId) {
-        return buildToken(userId, accessExpiry);
+        return buildToken(userId, accessExpiry, "access");
     }
 
     public String generateRefreshToken(Long userId) {
-        return buildToken(userId, refreshExpiry);
+        return buildToken(userId, refreshExpiry, "refresh");
     }
 
-    private String buildToken(Long userId, long expirySeconds) {
+    private String buildToken(Long userId, long expirySeconds, String type) {
         return Jwts.builder()
             .subject(String.valueOf(userId))
+            .claim("type", type)
             .issuedAt(new Date())
             .expiration(new Date(System.currentTimeMillis() + expirySeconds * 1000))
             .signWith(signingKey())
@@ -43,20 +44,31 @@ public class JwtProvider {
     }
 
     public Long extractUserId(String token) {
-        Claims claims = Jwts.parser()
-            .verifyWith(signingKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
-        return Long.valueOf(claims.getSubject());
+        return Long.valueOf(parseClaims(token).getSubject());
+    }
+
+    public boolean isRefreshToken(String token) {
+        try {
+            return "refresh".equals(parseClaims(token).get("type", String.class));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public boolean isValid(String token) {
         try {
-            extractUserId(token);
+            parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+            .verifyWith(signingKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
     }
 }

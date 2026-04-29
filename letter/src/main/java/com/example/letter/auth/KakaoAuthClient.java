@@ -15,25 +15,29 @@ public class KakaoAuthClient {
     private static final String USER_URL  = "https://kapi.kakao.com/v2/user/me";
 
     private final String clientId;
+    private final String clientSecret;
     private final String redirectUri;
     private final RestClient restClient;
 
     public KakaoAuthClient(
         @Value("${culetter.kakao.client-id}") String clientId,
+        @Value("${culetter.kakao.client-secret}") String clientSecret,
         @Value("${culetter.kakao.redirect-uri}") String redirectUri,
         RestClient.Builder restClientBuilder
     ) {
-        this.clientId    = clientId;
-        this.redirectUri = redirectUri;
-        this.restClient  = restClientBuilder.build();
+        this.clientId     = clientId;
+        this.clientSecret = clientSecret;
+        this.redirectUri  = redirectUri;
+        this.restClient   = restClientBuilder.build();
     }
 
     public KakaoTokenResponse getToken(String code) {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("grant_type",   "authorization_code");
-        form.add("client_id",    clientId);
-        form.add("redirect_uri", redirectUri);
-        form.add("code",         code);
+        form.add("grant_type",    "authorization_code");
+        form.add("client_id",     clientId);
+        form.add("client_secret", clientSecret);
+        form.add("redirect_uri",  redirectUri);
+        form.add("code",          code);
 
         return restClient.post()
             .uri(TOKEN_URL)
