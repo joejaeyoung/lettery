@@ -92,9 +92,11 @@ export default function Home() {
     }
   }, [])
 
+  const isLoggedIn = !!localStorage.getItem('culetter_access_token')
+
   return (
     <section className="page active" id="page-home">
-      <Header right="login" />
+      <Header right={isLoggedIn ? 'avatar' : 'login'} />
       <main className="home-main">
         <div className="home-cards-label">
           <span>큐레터가 엄선한 오늘의 편지</span>

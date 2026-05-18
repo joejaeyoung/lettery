@@ -26,7 +26,6 @@ export default function Write() {
     if (!raw) return
     try {
       const draft = JSON.parse(raw) as { paperId: string; to: string; body: string; from: string }
-      setPaperId(draft.paperId)
       setTo(draft.to)
       setBody(draft.body)
       setFrom(draft.from)

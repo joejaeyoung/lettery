@@ -18,7 +18,7 @@ export default function Header({ right = 'avatar', onDraftClick, onDoneClick }: 
         </span>
       </div>
       {right === 'back' && (
-        <button className="header-btn" onClick={() => navigate('/')}>back</button>
+        <button className="header-btn" onClick={() => navigate(-1)}>back</button>
       )}
       {right === 'login' && (
         <button className="header-btn" onClick={() => navigate('/login')}>login</button>

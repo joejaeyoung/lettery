@@ -159,12 +159,13 @@ jobs:
 
             docker network inspect lettery-network >/dev/null 2>&1 || docker network create lettery-network
 
-            docker stop backend frontend 2>/dev/null || true
-            docker rm backend frontend 2>/dev/null || true
+            docker stop lettery-backend lettery-frontend 2>/dev/null || true
+            docker rm lettery-backend lettery-frontend 2>/dev/null || true
 
             docker run -d \
-              --name backend \
+              --name lettery-backend \
               --network lettery-network \
+              --add-host=host.docker.internal:host-gateway \
               -p 8080:8080 \
               -e DB_URL=$DB_URL \
               -e DB_USERNAME=$DB_USERNAME \
@@ -178,7 +179,7 @@ jobs:
               $DOCKERHUB_USERNAME/lettery-backend:latest
 
             docker run -d \
-              --name frontend \
+              --name lettery-frontend \
               --network lettery-network \
               -p 80:80 \
               --restart unless-stopped \
