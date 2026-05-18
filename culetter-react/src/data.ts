@@ -7,12 +7,13 @@ export type Paper = {
 }
 
 export const PAPERS: Paper[] = [
-  { id: 'tmpl_mint',       name: '꽃비 민트',       emoji: '🌿', categories: ['추천', '심플한'], imageUrl: '/images/편지지_꽃비_민트.png' },
-  { id: 'tmpl_lavender',   name: '달빛 라벤더',     emoji: '🌙', categories: ['추천', '심플한'], imageUrl: '/images/편지지_달빛_라벤더.png' },
-  { id: 'tmpl_starpink',   name: '별하늘 핑크',     emoji: '✨', categories: ['추천', '심플한'], imageUrl: '/images/편지지_별하늘_핑크.png' },
-  { id: 'tmpl_birthday',   name: '생일 축하해',     emoji: '🎂', categories: ['추천', '심플한'], imageUrl: '/images/편지지1.png' },
-  { id: 'tmpl_friendship', name: '우리 우정 뽀에버', emoji: '😍', categories: ['추천', '심플한'], imageUrl: '/images/편지지2.png' },
-  { id: 'tmpl_angel',      name: '엔젤 봄이 와요',   emoji: '🪽', categories: ['추천', '심플한'], imageUrl: '/images/편지지3.png' },
+  { id: 'tmpl_mint',       name: '꽃비 민트',       emoji: '🌿', categories: ['추천', '심플한'], imageUrl: '/images/paper-mint.png' },
+  { id: 'tmpl_lavender',   name: '달빛 라벤더',     emoji: '🌙', categories: ['추천', '심플한'], imageUrl: '/images/paper-lavender.png' },
+  { id: 'tmpl_starpink',   name: '별하늘 핑크',     emoji: '✨', categories: ['추천', '심플한'], imageUrl: '/images/paper-starpink.png' },
+  { id: 'tmpl_birthday',   name: '생일 축하해',     emoji: '🎂', categories: ['추천', '심플한'], imageUrl: '/images/paper-birthday.png' },
+  { id: 'tmpl_friendship', name: '우리 우정 뽀에버', emoji: '😍', categories: ['추천', '심플한'], imageUrl: '/images/paper-friendship.png' },
+  { id: 'tmpl_angel',      name: '엔젤 봄이 와요',   emoji: '🪽', categories: ['추천', '심플한'], imageUrl: '/images/paper-angel.png' },
+  { id: 'tmpl_paper4',    name: '고양이의 편지',      emoji: '🐱', categories: ['추천', '심플한'], imageUrl: '/images/paper-cat.png' },
 ]
 
 export const SAMPLE_LETTER =

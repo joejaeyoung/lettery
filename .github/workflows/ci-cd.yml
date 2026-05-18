@@ -1,4 +1,4 @@
-name: Docker Build & Deploy
+name: CI / CD
 
 on:
   push:
@@ -10,10 +10,66 @@ on:
       - main
 
 jobs:
+  backend-test:
+    name: Backend – Test (Java 17)
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: letter
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: ./gradlew test --no-daemon
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+  frontend-build:
+    name: Frontend – Build (Node 20)
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: culetter-react
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: culetter-react/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_BASE: /v1
+          VITE_KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          VITE_KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
+
   build-backend:
     name: Build & Push Backend
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    needs: backend-test
 
     steps:
       - name: Checkout
@@ -43,7 +99,7 @@ jobs:
   build-frontend:
     name: Build & Push Frontend
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    needs: frontend-build
 
     steps:
       - name: Checkout
@@ -103,12 +159,13 @@ jobs:
 
             docker network inspect lettery-network >/dev/null 2>&1 || docker network create lettery-network
 
-            docker stop backend frontend 2>/dev/null || true
-            docker rm backend frontend 2>/dev/null || true
+            docker stop lettery-backend lettery-frontend 2>/dev/null || true
+            docker rm lettery-backend lettery-frontend 2>/dev/null || true
 
             docker run -d \
-              --name backend \
+              --name lettery-backend \
               --network lettery-network \
+              --add-host=host.docker.internal:host-gateway \
               -p 8080:8080 \
               -e DB_URL=$DB_URL \
               -e DB_USERNAME=$DB_USERNAME \
@@ -122,7 +179,7 @@ jobs:
               $DOCKERHUB_USERNAME/lettery-backend:latest
 
             docker run -d \
-              --name frontend \
+              --name lettery-frontend \
               --network lettery-network \
               -p 80:80 \
               --restart unless-stopped \
