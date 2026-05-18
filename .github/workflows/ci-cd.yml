@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - feature/backend-mvp
   pull_request:
     types: [closed]
     branches:
       - main
+      - feature/backend-mvp
 
 jobs:
   backend-test:
