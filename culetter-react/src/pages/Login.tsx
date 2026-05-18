@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { LOGO_SVG } from '../data'
@@ -15,26 +15,26 @@ export default function Login() {
   const navigate = useNavigate()
   const { show } = useToast()
   const [loading, setLoading] = useState(false)
+  const codeHandled = useRef(false)
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get('code')
-    if (!code) return
+    if (!code || codeHandled.current) return
 
-    let active = true
+    codeHandled.current = true
     window.history.replaceState({}, '', '/login')
     setLoading(true)
 
     api.kakaoLogin(code)
       .then(data => {
-        if (!active) return
         localStorage.setItem('culetter_access_token', data.accessToken)
         localStorage.setItem('culetter_refresh_token', data.refreshToken)
-        navigate('/select')
+        localStorage.setItem('culetter_user', JSON.stringify(data.user))
+        const hasDraft = !!sessionStorage.getItem('culetter_draft')
+        navigate(hasDraft ? '/write' : '/select')
       })
-      .catch(() => { if (active) show('로그인에 실패했어요 😢') })
-      .finally(() => { if (active) setLoading(false) })
-
-    return () => { active = false }
+      .catch(() => show('로그인에 실패했어요 😢'))
+      .finally(() => setLoading(false))
   }, [navigate, show])
 
   const handleKakaoLogin = () => {

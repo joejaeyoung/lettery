@@ -7,6 +7,17 @@ export default function Profile() {
   const { show } = useToast()
   const locked = (label: string) => show(`${label} 기능은 준비 중이에요 🔒`)
 
+  const raw = localStorage.getItem('culetter_user')
+  const user = raw ? JSON.parse(raw) as { id: number; nickname: string; email: string } : null
+
+  const handleLogout = () => {
+    localStorage.removeItem('culetter_access_token')
+    localStorage.removeItem('culetter_refresh_token')
+    localStorage.removeItem('culetter_user')
+    show('로그아웃되었어요 👋')
+    setTimeout(() => navigate('/login'), 600)
+  }
+
   return (
     <section className="page active" id="page-profile">
       <Header right="back" />
@@ -22,8 +33,8 @@ export default function Profile() {
               </svg>
             </div>
             <div className="profile-info">
-              <p className="profile-name">연우</p>
-              <p className="profile-email">cobs1014@gmail.com</p>
+              <p className="profile-name">{user?.nickname ?? '알 수 없음'}</p>
+              <p className="profile-email">{user?.email ?? ''}</p>
             </div>
           </div>
 
@@ -52,7 +63,7 @@ export default function Profile() {
 
           <button
             className="profile-logout"
-            onClick={() => { show('로그아웃되었어요 👋'); setTimeout(() => navigate('/login'), 600) }}
+            onClick={handleLogout}
           >로그아웃</button>
         </div>
         <button className="profile-withdraw" onClick={() => show('회원 탈퇴 기능은 준비 중이에요')}>

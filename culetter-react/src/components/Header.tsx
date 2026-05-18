@@ -13,13 +13,15 @@ export default function Header({ right = 'avatar', onDraftClick, onDoneClick }: 
     <header className="header">
       <div className="logo" onClick={() => navigate('/')}>
         <img src={LOGO_SVG} alt="Culetter 로고" />
-        <span className="logo-text">Culetter</span>
+        <span className="logo-text">
+          큐레터<span className="logo-tag">Culetter</span>
+        </span>
       </div>
       {right === 'back' && (
-        <button className="header-btn" onClick={() => navigate('/')}>뒤로</button>
+        <button className="header-btn" onClick={() => navigate(-1)}>back</button>
       )}
       {right === 'login' && (
-        <button className="header-btn" onClick={() => navigate('/login')}>로그인</button>
+        <button className="header-btn" onClick={() => navigate('/login')}>login</button>
       )}
       {right === 'avatar' && (
         <img className="header-avatar" src={AVATAR_SVG} alt="프로필" onClick={() => navigate('/profile')} />

@@ -30,4 +30,16 @@ class JwtProviderTest {
         assertThat(jwtProvider.isValid(token)).isTrue();
         assertThat(jwtProvider.extractUserId(token)).isEqualTo(99L);
     }
+
+    @Test
+    void accessToken은_isRefreshToken이_false() {
+        String token = jwtProvider.generateAccessToken(1L);
+        assertThat(jwtProvider.isRefreshToken(token)).isFalse();
+    }
+
+    @Test
+    void refreshToken은_isRefreshToken이_true() {
+        String token = jwtProvider.generateRefreshToken(1L);
+        assertThat(jwtProvider.isRefreshToken(token)).isTrue();
+    }
 }
