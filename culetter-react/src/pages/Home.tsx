@@ -33,7 +33,7 @@ export default function Home() {
   const busy = useRef(false)
 
   // 홈 캐러셀에서 보여줄 3장 (테마 편지지)
-  const cards = PAPERS.slice(0, 3)
+  const cards = PAPERS.slice(4, 7)
 
   useEffect(() => {
     const stage = stageRef.current
