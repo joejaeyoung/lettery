@@ -26,7 +26,7 @@ RUN printf 'server {\n\
     root /usr/share/nginx/html;\n\
     index index.html;\n\
     location /v1/ {\n\
-        proxy_pass http://backend:8080/v1/;\n\
+        proxy_pass http://lettery-backend:8080/v1/;\n\
         proxy_http_version 1.1;\n\
         proxy_set_header Host $host;\n\
         proxy_set_header X-Real-IP $remote_addr;\n\
