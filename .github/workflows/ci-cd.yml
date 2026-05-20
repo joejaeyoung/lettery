@@ -160,6 +160,7 @@ jobs:
             docker pull $DOCKERHUB_USERNAME/lettery-frontend:latest
 
             docker network inspect lettery-network >/dev/null 2>&1 || docker network create lettery-network
+            docker network connect lettery-network mysql 2>/dev/null || true
 
             # 기존 서비스(asm-timetable) 포함 포트 80/8080 점유 컨테이너 모두 정리
             docker rm -f backend frontend lettery-backend lettery-frontend 2>/dev/null || true
